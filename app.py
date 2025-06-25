@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 # Load model
 # Ensure 'random_forest_model.pkl' is a trained RandomForestRegressor
-model = joblib.load('random_forest_model.pkl')
+model = joblib.load('lennie_model.pkl')
 # scaler = joblib.load('scaler.pkl')  # If used
 
 @app.route('/')
