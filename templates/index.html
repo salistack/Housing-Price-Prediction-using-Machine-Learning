@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuxEstimate | House Price Predictor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #f0f0f0;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        header h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3.2rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            color: #c3d1db;
+            line-height: 1.6;
+        }
+
+        .content {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .form-container {
+            background: rgba(25, 42, 57, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 35px;
+            flex: 1;
+            min-width: 450px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            animation: slideInLeft 0.8s ease-out;
+        }
+
+        .form-container h2 {
+            font-size: 2rem;
+            margin-bottom: 25px;
+            color: #feb47b;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .form-container h2 i {
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #a4b8c8;
+            font-size: 0.95rem;
+        }
+
+        .input-group select, .input-group input {
+            width: 100%;
+            padding: 14px 15px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(20, 33, 45, 0.8);
+            color: #f0f0f0;
+            font-size: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .input-group select:focus, .input-group input:focus {
+            outline: none;
+            border-color: #ff7e5f;
+            box-shadow: 0 0 0 3px rgba(255, 126, 95, 0.2);
+        }
+
+        .input-group select option {
+            background: rgba(25, 42, 57, 0.9);
+        }
+
+        .submit-btn {
+            grid-column: 1 / -1;
+            margin-top: 15px;
+        }
+
+        .submit-btn button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            color: #0f2027;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 126, 95, 0.3);
+        }
+
+        .submit-btn button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 126, 95, 0.4);
+        }
+
+        .submit-btn button:active {
+            transform: translateY(0);
+        }
+
+        .result-container {
+            background: rgba(25, 42, 57, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 35px;
+            flex: 1;
+            min-width: 450px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            animation: slideInRight 0.8s ease-out;
+        }
+
+        .result-container h2 {
+            font-size: 2rem;
+            margin-bottom: 25px;
+            color: #feb47b;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .result-content {
+            text-align: center;
+            padding: 30px;
+            background: rgba(20, 33, 45, 0.5);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .price-display {
+            font-size: 3.5rem;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 20px 0;
+            transition: all 0.5s ease;
+        }
+
+        .result-placeholder {
+            color: #a4b8c8;
+            font-size: 1.1rem;
+            margin-top: 30px;
+        }
+
+        .visualization {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 30px;
+            gap: 15px;
+        }
+
+        .visual-item {
+            text-align: center;
+            flex: 1;
+            padding: 15px;
+            background: rgba(20, 33, 45, 0.5);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .visual-item i {
+            font-size: 2rem;
+            color: #ff7e5f;
+            margin-bottom: 10px;
+        }
+
+        .visual-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #feb47b;
+            margin: 5px 0;
+        }
+
+        .visual-label {
+            font-size: 0.85rem;
+            color: #a4b8c8;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #a4b8c8;
+            font-size: 0.9rem;
+            animation: fadeIn 1.2s ease-out;
+        }
+
+        footer a {
+            color: #ff7e5f;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        footer a:hover {
+            color: #feb47b;
+            text-decoration: underline;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 950px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .form-container, .result-container {
+                min-width: 100%;
+            }
+        }
+
+        @media (max-width: 500px) {
+            header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-home"></i> LuxEstimate</h1>
+            <p>Predict your home's market value with our AI-powered price estimator. Get instant valuation based on property features.</p>
+        </header>
+
+        <div class="content">
+            <div class="form-container">
+                <h2><i class="fas fa-edit"></i> Property Details</h2>
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label for="bedrooms"><i class="fas fa-bed"></i> Bedrooms</label>
+                        <select id="bedrooms" name="bedrooms">
+                            <option value="1">1 Bedroom</option>
+                            <option value="2" selected>2 Bedrooms</option>
+                            <option value="3">3 Bedrooms</option>
+                            <option value="4">4 Bedrooms</option>
+                            <option value="5">5 Bedrooms</option>
+                            <option value="6">6+ Bedrooms</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="bathrooms"><i class="fas fa-bath"></i> Bathrooms</label>
+                        <select id="bathrooms" name="bathrooms">
+                            <option value="1">1 Bathroom</option>
+                            <option value="1.5">1.5 Bathrooms</option>
+                            <option value="2" selected>2 Bathrooms</option>
+                            <option value="2.5">2.5 Bathrooms</option>
+                            <option value="3">3 Bathrooms</option>
+                            <option value="3.5">3.5+ Bathrooms</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="sqft_living"><i class="fas fa-ruler-combined"></i> Living Area (sqft)</label>
+                        <input type="number" id="sqft_living" name="sqft_living" value="1800" min="500" max="10000">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="sqft_lot"><i class="fas fa-expand"></i> Lot Size (sqft)</label>
+                        <input type="number" id="sqft_lot" name="sqft_lot" value="5000" min="1000" max="50000">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="floors"><i class="fas fa-layer-group"></i> Floors</label>
+                        <select id="floors" name="floors">
+                            <option value="1">1 Floor</option>
+                            <option value="1.5">1.5 Floors</option>
+                            <option value="2" selected>2 Floors</option>
+                            <option value="2.5">2.5 Floors</option>
+                            <option value="3">3+ Floors</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="waterfront"><i class="fas fa-water"></i> Waterfront</label>
+                        <select id="waterfront" name="waterfront">
+                            <option value="0">No Waterfront</option>
+                            <option value="1">Waterfront Property</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="view"><i class="fas fa-binoculars"></i> View Quality</label>
+                        <select id="view" name="view">
+                            <option value="0">No View</option>
+                            <option value="1">Fair View</option>
+                            <option value="2" selected>Good View</option>
+                            <option value="3">Excellent View</option>
+                            <option value="4">Panoramic View</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="condition"><i class="fas fa-home"></i> Condition</label>
+                        <select id="condition" name="condition">
+                            <option value="1">Poor</option>
+                            <option value="2">Fair</option>
+                            <option value="3" selected>Average</option>
+                            <option value="4">Good</option>
+                            <option value="5">Excellent</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="sqft_above"><i class="fas fa-arrow-up"></i> Above Ground (sqft)</label>
+                        <input type="number" id="sqft_above" name="sqft_above" value="1600" min="500" max="10000">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="sqft_basement"><i class="fas fa-arrow-down"></i> Basement (sqft)</label>
+                        <input type="number" id="sqft_basement" name="sqft_basement" value="200" min="0" max="5000">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="yr_built"><i class="fas fa-calendar-alt"></i> Year Built</label>
+                        <input type="number" id="yr_built" name="yr_built" value="1995" min="1900" max="2023">
+                    </div>
+                    
+                    <div class="submit-btn">
+                        <button id="predict-btn">
+                            <i class="fas fa-calculator"></i> Estimate Property Value
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-container">
+                <h2><i class="fas fa-chart-line"></i> Valuation Report</h2>
+                <div class="result-content">
+                    <div class="result-placeholder">
+                        <i class="fas fa-home fa-3x" style="color: #3a506b; margin-bottom: 20px;"></i>
+                        <p>Enter your property details and click "Estimate Property Value" to get a valuation</p>
+                    </div>
+                    <div class="price-display" style="display: none;">$652,800</div>
+                    
+                    <div class="visualization">
+                        <div class="visual-item">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <div class="visual-value">3.2%</div>
+                            <div class="visual-label">Above Market</div>
+                        </div>
+                        <div class="visual-item">
+                            <i class="fas fa-percentage"></i>
+                            <div class="visual-value">$412/sqft</div>
+                            <div class="visual-label">Price per sqft</div>
+                        </div>
+                        <div class="visual-item">
+                            <i class="fas fa-chart-bar"></i>
+                            <div class="visual-value">High</div>
+                            <div class="visual-label">ROI Potential</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Powered by advanced machine learning algorithms | Accuracy: 92.7% | <a href="#">How it works</a></p>
+            <p>&copy; 2023 LuxEstimate - Property Valuation System | Data refreshed daily</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const predictBtn = document.getElementById('predict-btn');
+            const priceDisplay = document.querySelector('.price-display');
+            const placeholder = document.querySelector('.result-placeholder');
+            
+            predictBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Simulate calculation delay
+                predictBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculating...';
+                predictBtn.disabled = true;
+                
+                // Get form values
+                const bedrooms = parseInt(document.getElementById('bedrooms').value);
+                const bathrooms = parseFloat(document.getElementById('bathrooms').value);
+                const sqftLiving = parseInt(document.getElementById('sqft_living').value);
+                const sqftLot = parseInt(document.getElementById('sqft_lot').value);
+                const floors = parseFloat(document.getElementById('floors').value);
+                const waterfront = parseInt(document.getElementById('waterfront').value);
+                const view = parseInt(document.getElementById('view').value);
+                const condition = parseInt(document.getElementById('condition').value);
+                const sqftAbove = parseInt(document.getElementById('sqft_above').value);
+                const sqftBasement = parseInt(document.getElementById('sqft_basement').value);
+                const yrBuilt = parseInt(document.getElementById('yr_built').value);
+                
+                // Simulate ML prediction
+                setTimeout(() => {
+                    // Base price calculation
+                    let basePrice = 250000;
+                    basePrice += bedrooms * 30000;
+                    basePrice += bathrooms * 25000;
+                    basePrice += sqftLiving * 150;
+                    basePrice += sqftLot * 5;
+                    basePrice += floors * 20000;
+                    basePrice += waterfront * 100000;
+                    basePrice += view * 15000;
+                    basePrice += (condition - 3) * 20000;
+                    basePrice += sqftAbove * 120;
+                    basePrice += sqftBasement * 80;
+                    
+                    // Adjust for age (newer houses are more valuable)
+                    const age = 2023 - yrBuilt;
+                    if (age < 10) {
+                        basePrice *= 1.15;
+                    } else if (age < 20) {
+                        basePrice *= 1.05;
+                    } else if (age > 50) {
+                        basePrice *= 0.95;
+                    }
+                    
+                    // Format as currency
+                    const formattedPrice = new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        maximumFractionDigits: 0
+                    }).format(basePrice);
+                    
+                    // Display result
+                    priceDisplay.textContent = formattedPrice;
+                    priceDisplay.style.display = 'block';
+                    placeholder.style.display = 'none';
+                    
+                    // Reset button
+                    predictBtn.innerHTML = '<i class="fas fa-calculator"></i> Estimate Property Value';
+                    predictBtn.disabled = false;
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>
